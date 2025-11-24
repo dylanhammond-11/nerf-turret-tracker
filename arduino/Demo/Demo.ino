@@ -109,18 +109,18 @@ void setup() {
 
 void loop() {
   delay(1000);
+  tilt.write(90);
+  delay(1000);
   tilt.write(100);
+  delay(1000);
+  tilt.write(120);
+  //fire();
+  delay(1000);
+  tilt.write(130);
+  delay(1000);
+  //fire();
   delay(500);
-  pan.write(0);
-  delay(500);
-  pan.write(20);
-  fire();
-  delay(500);
-  pan.write(60);
-  delay(500);
-  fire();
-  delay(500);
-  tilt.write(110);
+  tilt.write(160);
   pan.write(100);
   delay(500);
   fire();

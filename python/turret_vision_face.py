@@ -1,10 +1,17 @@
+# Python vision code for implementation with 3d printed nerf turret see https://dylanhammond-11.github.io/projects/auto-nerf-turret/index/
+# Use alongside turret_face.ino for full turret implementation
+# Code connects to external camera and detects a face. Center coordinates of face are
+# sent via serial to microcontroller code to process and track
+# Code by Dylan Hammond
+
 import cv2
 import serial
 import time
 import struct
 
-ser = serial.Serial('COM8' , 115200)
+ser = serial.Serial('COM8' , 115200) # Match up with Arduino IDE terminal
 time.sleep(2)
+
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades+ "haarcascade_frontalface_default.xml")
 
 myCamera = cv2.VideoCapture(0)
@@ -32,7 +39,7 @@ while True:
         face_center = (x + w // 2, y + h // 2) # Finds coordinates of face center
         print(face_center)
         coordinates = struct.pack('<hh', face_center[0], face_center[1])
-        ser.write(coordinates)
+        ser.write(coordinates) # Send coordinates via serial
         #time.sleep(0.01)
         cv2.circle(frame, face_center, 5, (0, 0, 255), -1)  # red dot for face center
 

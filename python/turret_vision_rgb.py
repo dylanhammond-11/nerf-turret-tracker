@@ -1,3 +1,10 @@
+# Python vision code for implementation with 3d printed nerf turret see https://dylanhammond-11.github.io/projects/auto-nerf-turret/index/
+# Use alongside turret_color.ino for full turret implementation
+# Code connects to external camera and detects multiple rgb colored objects. Center coordinates of objects are
+# sent via serial to microcontroller code to process and track
+# NOTE: This code is currently still in development alongside turret_color.ino and isn't fully functional
+# Code by Dylan Hammond
+
 import cv2
 import serial
 import numpy as np

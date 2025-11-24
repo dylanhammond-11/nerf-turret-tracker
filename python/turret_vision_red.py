@@ -1,20 +1,27 @@
+# Python vision code for implementation with 3d printed nerf turret see https://dylanhammond-11.github.io/projects/auto-nerf-turret/index/
+# Use alongside turret_face.ino for full turret implementation
+# Code connects to external camera and detects a red object. Center coordinates of red object are
+# sent via serial to microcontroller code to process and track
+# Code by Dylan Hammond
+
 import cv2
 import serial
 import numpy as np
 import struct
 
-ser = serial.Serial('COM8', 115200)
-myCamera = cv2.VideoCapture(0)
+ser = serial.Serial('COM8', 115200) # Match up with Arduino IDE terminal
+myCamera = cv2.VideoCapture(1)  # 1 for usb camera
 
 lowerRed1 = np.array([0, 100, 100])
 upperRed1 = np.array([10,255,255])
 lowerRed2 = np.array([160,100,100])
 upperRed2 = np.array([179,255,255])
 
-areaThreshold = 500 # Area needs to be this big to be an object
+areaThreshold = 500 # Area needs to be this big to be considered an object
 
 if not myCamera.isOpened():
     print("No camera found")
+
 while True:
     ret,frame = myCamera.read()
     if not ret:
@@ -43,7 +50,7 @@ while True:
 
             face_center = (x + w // 2, y + h // 2)
             coordinates = struct.pack('<hh', face_center[0], face_center[1])
-            ser.write(coordinates)
+            ser.write(coordinates) # Send coordinates via serial
 
 
 
@@ -51,7 +58,7 @@ while True:
     cv2.imshow("Frame", frame)
 
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'): # Press 'Q' Key to exit
         break
 
 myCamera.release()

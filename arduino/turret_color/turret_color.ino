@@ -1,5 +1,9 @@
-// Arduino code for controlling 3d printed nerf turret
-// Code created by Dylan Hammond
+// Arduino code for controlling 3d printed nerf turret see https://dylanhammond-11.github.io/projects/auto-nerf-turret/index/
+// Use alongside turret_vision_rgb.py for full implementation with the turret
+// NOTE: This code is currently still in development alongside turret_vision_rgb.py and isn't fully functional
+// Code by Dylan Hammond
+
+
 
 # include <Servo.h>
 
@@ -24,7 +28,7 @@ int blueCoordinates[maxBalloons];
 
 
 void fire(){
-  uint8_t shootingSpeed = 255; // PWM for motor shooter
+  uint8_t shootingSpeed = 100; // PWM for motor shooter
   unsigned long firingTime = millis();
   static unsigned long previousTime = 0;
   static unsigned long motorDelay = 100, servoDelay = 300; // Delays between servo and motor movement
@@ -95,6 +99,7 @@ float updatePID(float dt){
 
   essPrevTilt = essTilt;
   pastIntegralTilt = integralTilt;
+  ////////////////////////////
   }
 
 }

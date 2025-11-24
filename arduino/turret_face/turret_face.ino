@@ -1,16 +1,22 @@
+// Arduino code for controlling 3d printed nerf turret see https://dylanhammond-11.github.io/projects/auto-nerf-turret/index/
+// Use alongside turret_vision_face.py and turret_vision_red.py for full implementation with the turret
+// Code by Dylan Hammond
+
+
 # include <Servo.h>
 
 Servo pan;
 Servo tilt;
 Servo load;
+
 uint8_t panPin= 4 , tiltPin = 3 , loadPin = 2; // Servo pin numbers
 uint8_t IN1 = 6, IN2 = 7, IN3 = 11, IN4 = 12; // Motor driver pin numbers
-static int xCenter = 320 , yCenter = 240 ; // Pixel center of camera 
-int pixelBuffer = 50; // Buffer range that determines when it is on-target and ready to fire
+static int xCenter = 320 , yCenter = 240 ; // Pixel center of camera (640x480)
+int pixelBuffer = 50; // Pixel buffer range that determines when it is on-target and ready to fire
 
 int xTarget = 0;
 int yTarget = 0;
-int sampleRate  = 100; // delay 
+int sampleRate  = 80; // Sample rate for pid loop
 bool targetFound = false;
 bool readyToFire = true; // This variable will turn the motors off until new CV2 data is recieved 
 bool firingInProgress = false;
@@ -19,9 +25,10 @@ bool firingInProgress = false;
 
 
 void fire() {
+  // Controls firing timing sequence through a switch statement
   static enum { IDLE, SPINNING_UP, LOADING, RESETTING, DONE } state = IDLE;
   static unsigned long fireStartTime = 0;
-  static const uint8_t shootingSpeed = 255;
+  static const uint8_t shootingSpeed = 100;
   static const unsigned long motorDelay = 700;
   static const unsigned long servoDelay = 300;
 
@@ -63,9 +70,8 @@ void fire() {
   state = IDLE;
   targetFound = false;
   readyToFire = false;
-  firingInProgress = false;  // ✅ We're done firing!
+  firingInProgress = false;  // We're done firing!
   break;
-
 
   }
 }
@@ -74,7 +80,7 @@ void fire() {
 void aim() {
   if ((abs(xCenter - xTarget) < pixelBuffer) &&
       (abs(yCenter - yTarget) < pixelBuffer) &&
-      targetFound && readyToFire && !firingInProgress) {
+      targetFound  && !firingInProgress) {
 
     firingInProgress = true;  // Mark that firing has started
   }
@@ -85,8 +91,8 @@ void aim() {
 float updatePID(float dt){
   
 
-  float kpPan = 0.2, kiPan = 0, kdPan = 0; // Gains for Pan and Tilt PID Controller
-  float kpTilt = 0.2, kiTilt = 0, kdTilt = 0;
+  float kpPan = 0.0725, kiPan = 0, kdPan = 0; // Gains for Pan and Tilt PID Controller
+  float kpTilt = .065, kiTilt = 0, kdTilt = 0;
   static float pastIntegralPan= 0, pastIntegralTilt = 0;
   static float essPrevPan = 0, essPrevTilt = 0;
 
@@ -108,7 +114,7 @@ float updatePID(float dt){
   /////////////////////////////
 
 
-  ///////PID for tilt/////////
+  ///////PID for tilt//////////
   if(abs(essTilt)> pixelBuffer){
   float integralTilt  = essTilt*dt + pastIntegralTilt;
   float derivativeTilt = (essTilt-essPrevTilt)/dt;
@@ -120,6 +126,7 @@ float updatePID(float dt){
 
   essPrevTilt = essTilt;
   pastIntegralTilt = integralTilt;
+  ///////////////////////////////
   }
 
 }
